@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/alma/alma.iml" filepath="$PROJECT_DIR$/alma/alma.iml" />
+      <module fileurl="file://$PROJECT_DIR$/alma/android/alma_android.iml" filepath="$PROJECT_DIR$/alma/android/alma_android.iml" />
+    </modules>
+  </component>
+</project>
