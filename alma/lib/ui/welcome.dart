@@ -12,7 +12,7 @@ class _WelcomeState extends State<Welcome> {
 
   @override
   void initState() {
-    ServerApi.getLoggedUser().then((ok) =>
+    ServerApi.getInstance().getLoggedUser().then((ok) =>
       Navigator.pushReplacementNamed(context, ok ? "/home" : "/login")
     );
     super.initState();

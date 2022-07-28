@@ -2,17 +2,25 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:alma/assets/api_constants.dart';
+import 'package:alma/services/preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ServerApi {
-  static String? token;
-  static String urlBase = dotenv.get("API_URL");
-  static http.Client client = http.Client();
-  static SharedPreferences? sharedPreferences;
+  static final ServerApi _instance = ServerApi();
+  String? _token;
+  String urlBase = dotenv.get("API_URL");
+  http.Client client = http.Client();
+  Function? onLogout;
 
-  static Future<String?> authUser(String email, String password) async {
+  Future logout() async{
+    Preferences.getInstance().remove("token");
+    if(onLogout != null){
+      onLogout!();
+    }
+  }
+
+  Future<String?> authUser(String email, String password) async {
     return client.post(
       getUrl(login),
       headers: <String, String>{
@@ -34,7 +42,7 @@ class ServerApi {
     });
   }
 
-  static Future<String?> registerUser(String email, String password, String deviceId) async {
+  Future<String?> registerUser(String email, String password, String deviceId) async {
     return client.post(
         getUrl(register),
         headers: <String, String>{
@@ -60,27 +68,58 @@ class ServerApi {
     });
   }
 
-  static Uri getUrl(String subPath) {
+
+  Future<String?> recoverPassword(String email) {
+    return client.post(
+        getUrl(recover),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, String>{
+          "Email": email,
+        })
+    ).then((response) {
+      if (response.statusCode == HttpStatus.ok) {
+        Map<String, dynamic> data = json.decode(response.body);
+        if (data["success"] == true) {
+          return null;
+        } else {
+          return getMessageError(data);
+        }
+      } else {
+        return response.toString();
+      }
+    });
+  }
+
+  Uri getUrl(String subPath) {
     return Uri.parse("$urlBase/$subPath");
   }
 
-  static String getMessageError(Map<String, dynamic> data) {
+  String getMessageError(Map<String, dynamic> data) {
     var x = data['messageList'] as List;
     var list = (x).map((item) => item as String).toList();
     return list.join("\n");
   }
 
-  static void setToken(String newToken) {
-    token = newToken;
-    sharedPreferences?.setString("token", newToken);
+  void setToken(String newToken) {
+    _token = newToken;
+    Preferences.getInstance().setString("token", newToken);
   }
 
-  static Future<bool> getLoggedUser() async {
-    sharedPreferences = await SharedPreferences.getInstance();
-    token = sharedPreferences?.getString("token");
-    if (token != null) {
+  Future<bool> getLoggedUser() async {
+    _token = Preferences.getInstance().getString("token");
+    if (_token != null) {
       return true;
     }
     return false;
   }
+  ServerApi({
+    this.onLogout,
+  });
+
+  static ServerApi getInstance() {
+    return _instance;
+  }
+
 }
