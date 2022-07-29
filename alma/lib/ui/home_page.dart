@@ -1,6 +1,7 @@
-import 'package:alma/services/preferences.dart';
-import 'package:alma/services/server_api.dart';
 import 'package:flutter/material.dart';
+
+import '../models/user.dart';
+import '../services/server_api.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,79 +12,108 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late ServerApi serverApi;
-  late String email;
+  User? user;
+  late Future _dataFuture;
 
   @override
   void initState() {
     serverApi = ServerApi.getInstance();
-    serverApi.onLogout = (){
+    serverApi.onLogout = () {
       Navigator.pushReplacementNamed(context, "/");
     };
-    email = Preferences.getInstance().getString("email")!;
+    _dataFuture = getUserData();
+
     super.initState();
+  }
+
+  Future getUserData() async{
+    while(true){
+      var result = await serverApi.getUserData();
+      if(result.error){
+        if(result.errorCode == 401) {
+          return;
+        }
+        Future.delayed(Duration(seconds: 1));
+        continue;
+      }
+      setState(() {
+        user = result.data!;
+      });
+      return;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('DashBoard'),
-        leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: Icon(Icons.menu),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-              tooltip: 'Abrir Menu',
-            );
-          },
+        appBar: AppBar(
+          title: const Text('DashBoard'),
         ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            DrawerHeader(
-              decoration: BoxDecoration(
-                color: Theme.of(context).primaryColor,
+        drawer: Drawer(
+          child: ListView(
+            children: <Widget>[
+              DrawerHeader(
+                decoration: BoxDecoration(
+                  color: Theme
+                      .of(context)
+                      .primaryColor,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user?.farm?.propertyName ?? "",
+                      style: TextStyle(fontSize: 20, color: Colors.white),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      user?.email ?? "",
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    email,
-                    style: TextStyle(fontSize: 20, color: Colors.white),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    email,
-                    style: TextStyle(fontSize: 14, color: Colors.white),
-                  ),
-                ],
+              ListTile(
+                leading: Icon(Icons.message),
+                title: Text('Messages'),
               ),
-            ),
-            ListTile(
-              leading: Icon(Icons.message),
-              title: Text('Messages'),
-            ),
-            ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Sair'),
-              onTap: serverApi.logout,
-            ),
-            ListTile(
-              leading: Icon(Icons.settings),
-              title: Text('Settings'),
-            ),
-          ],
+              ListTile(
+                leading: Icon(Icons.settings),
+                title: Text('Configurações'),
+                onTap: () => Navigator.popAndPushNamed(context, "/config"),
+              ),
+              ListTile(
+                leading: Icon(Icons.logout),
+                title: Text('Sair'),
+                onTap: serverApi.logout,
+              ),
+            ],
+          ),
         ),
-      ),
-      body: Row(
+        body: FutureBuilder(
+            future: _dataFuture,
+            builder: (BuildContext c, AsyncSnapshot s) {
+              if (s.connectionState == ConnectionState.waiting) {
+                return Center(child: SizedBox(
+                    height: 50,
+                    width: 50,
+                    child:CircularProgressIndicator()));
+              }
+              if (s.hasData) {
+                return Text(s.data);
+              }
+              return bodyApp();
+            }
+        )
+    );
+  }
+
+  Widget bodyApp() {
+    return Row(
           children: [
             Text("hi")
           ]
-      ),
-    );
+      );
   }
 
   Widget buildMenuItem({
@@ -101,4 +131,5 @@ class _HomePageState extends State<HomePage> {
       onTap: onClicked,
     );
   }
+
 }

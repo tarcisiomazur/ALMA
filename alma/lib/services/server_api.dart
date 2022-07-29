@@ -1,10 +1,14 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:alma/assets/api_constants.dart';
+import 'package:alma/models/user.dart';
 import 'package:alma/services/preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+
+import 'api_response.dart';
 
 class ServerApi {
   static final ServerApi _instance = ServerApi();
@@ -12,6 +16,8 @@ class ServerApi {
   String urlBase = dotenv.get("API_URL");
   http.Client client = http.Client();
   Function? onLogout;
+  late Map<String, String> defaultHeader;
+
 
   Future logout() async{
     Preferences.getInstance().remove("token");
@@ -104,12 +110,21 @@ class ServerApi {
 
   void setToken(String newToken) {
     _token = newToken;
+    buildDefaultHeader();
     Preferences.getInstance().setString("token", newToken);
+  }
+
+  void buildDefaultHeader(){
+    defaultHeader = {
+      'Content-Type': 'application/json; charset=UTF-8',
+      'Authorization': 'Bearer $_token'
+    };
   }
 
   Future<bool> getLoggedUser() async {
     _token = Preferences.getInstance().getString("token");
     if (_token != null) {
+      buildDefaultHeader();
       return true;
     }
     return false;
@@ -120,6 +135,36 @@ class ServerApi {
 
   static ServerApi getInstance() {
     return _instance;
+  }
+
+  FutureOr<APIResponse<T>> Function(http.Response) checkResponse<T>(
+      FutureOr<APIResponse<T>> Function(http.Response response) onValue) {
+    return (response) {
+      switch(response.statusCode){
+        case HttpStatus.ok:
+          return onValue(response);
+        case HttpStatus.unauthorized:
+          logout();
+          return APIResponse(error: true,errorMessage: "Usuário não autorizado", errorCode: 401);
+        default:
+          return APIResponse(error: true, errorMessage: "Erro ${response.statusCode}");
+      }
+    };
+  }
+
+  Future<APIResponse<User>> getUserData() {
+    return client.get(
+      getUrl(userData),
+      headers: defaultHeader,
+    ).then(checkResponse((response) {
+      Map<String, dynamic> data = json.decode(response.body);
+      if (data["success"] == true) {
+        return APIResponse(data: User.fromJson(data["payload"]));
+      } else {
+        return APIResponse(
+            error: true, errorMessage: getMessageError(data));
+      }
+    }));
   }
 
 }

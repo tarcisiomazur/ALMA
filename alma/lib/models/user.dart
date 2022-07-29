@@ -7,18 +7,12 @@ part 'user.g.dart';
 
 @JsonSerializable()
 class User {
-  int id;
   String email;
-  String salt;
-  String password;
   bool changePassword;
   String role;
   Farm farm;
 
-  User(this.id,
-      this.email,
-      this.salt,
-      this.password,
+  User(this.email,
       this.changePassword,
       this.role,
       this.farm,);
