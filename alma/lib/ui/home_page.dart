@@ -74,8 +74,9 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               ListTile(
-                leading: Icon(Icons.message),
-                title: Text('Messages'),
+                leading: Image.asset("lib/assets/images/cow-1.png", height: 24, color: Colors.grey[600]),
+                title: Text('Vacas'),
+                onTap: () => Navigator.popAndPushNamed(context, "/cows"),
               ),
               ListTile(
                 leading: Icon(Icons.settings),

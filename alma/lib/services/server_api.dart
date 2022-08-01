@@ -2,21 +2,22 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:alma/assets/api_constants.dart';
+import 'package:alma/assets/constants/api_constants.dart';
+import 'package:alma/models/cow.dart';
 import 'package:alma/models/user.dart';
+import 'package:alma/services/api_response.dart';
 import 'package:alma/services/preferences.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
-import 'api_response.dart';
 
 class ServerApi {
   static final ServerApi _instance = ServerApi();
   String? _token;
-  String urlBase = dotenv.get("API_URL");
+  String urlBase = "https://192.168.0.114:20300";
   http.Client client = http.Client();
   Function? onLogout;
-  late Map<String, String> defaultHeader;
+  late Map<String, String> authHeader;
 
 
   Future logout() async{
@@ -27,8 +28,8 @@ class ServerApi {
   }
 
   Future<String?> authUser(String email, String password) async {
-    return client.post(
-      getUrl(login),
+    return await client.post(
+      getUrl(apiLogin),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -50,7 +51,7 @@ class ServerApi {
 
   Future<String?> registerUser(String email, String password, String deviceId) async {
     return client.post(
-        getUrl(register),
+        getUrl(apiRegister),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -77,7 +78,7 @@ class ServerApi {
 
   Future<String?> recoverPassword(String email) {
     return client.post(
-        getUrl(recover),
+        getUrl(apiRecover),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -110,12 +111,12 @@ class ServerApi {
 
   void setToken(String newToken) {
     _token = newToken;
-    buildDefaultHeader();
+    buildAuthHeader();
     Preferences.getInstance().setString("token", newToken);
   }
 
-  void buildDefaultHeader(){
-    defaultHeader = {
+  void buildAuthHeader(){
+    authHeader = {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer $_token'
     };
@@ -124,7 +125,7 @@ class ServerApi {
   Future<bool> getLoggedUser() async {
     _token = Preferences.getInstance().getString("token");
     if (_token != null) {
-      buildDefaultHeader();
+      buildAuthHeader();
       return true;
     }
     return false;
@@ -154,12 +155,32 @@ class ServerApi {
 
   Future<APIResponse<User>> getUserData() {
     return client.get(
-      getUrl(userData),
-      headers: defaultHeader,
+      getUrl(apiUserData),
+      headers: authHeader,
     ).then(checkResponse((response) {
       Map<String, dynamic> data = json.decode(response.body);
       if (data["success"] == true) {
         return APIResponse(data: User.fromJson(data["payload"]));
+      } else {
+        return APIResponse(
+            error: true, errorMessage: getMessageError(data));
+      }
+    }));
+  }
+
+  Future<APIResponse<List<Cow>>> getCows() {
+    return client.get(
+      getUrl(apiGetCows),
+      headers: authHeader,
+    ).then(checkResponse((response) {
+      Map<String, dynamic> data = json.decode(response.body);
+      if (data["success"] == true) {
+        if(data["payload"] is! List){
+          return APIResponse(error: true, errorMessage: "A lista de Vacas está vazia");
+        }
+        List<Cow> cows = [];
+        data["payload"].forEach((e) => cows.add(Cow.fromJson(e)));
+        return APIResponse(data: cows);
       } else {
         return APIResponse(
             error: true, errorMessage: getMessageError(data));

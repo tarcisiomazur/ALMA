@@ -13,7 +13,8 @@ class LoginPage extends StatelessWidget {
       Preferences.getInstance().setString("email", data.name);
       return await ServerApi.getInstance().authUser(data.name, data.password);
     }catch(ex){
-      return "Erro ao se comunicar com o servidor";
+      print(ex);
+      return ex.toString();
     }
   }
 

@@ -1,9 +1,9 @@
+import 'package:alma/ui/config_page.dart';
+import 'package:alma/ui/cows_page.dart';
+import 'package:alma/ui/home_page.dart';
+import 'package:alma/ui/login.dart';
+import 'package:alma/ui/welcome.dart';
 import 'package:flutter/material.dart';
-
-import 'ui/config_page.dart';
-import 'ui/home_page.dart';
-import 'ui/login.dart';
-import 'ui/welcome.dart';
 
 class RouteGenerator{
   static Route<dynamic> generateRoute(RouteSettings settings){
@@ -19,6 +19,8 @@ class RouteGenerator{
         return MaterialPageRoute(builder: (_) => HomePage());
       case '/config':
         return MaterialPageRoute(builder: (_) => ConfigPage());
+      case '/cows':
+        return MaterialPageRoute(builder: (_) => CowsPage());
       default:
         return _errorRoute();
     }
