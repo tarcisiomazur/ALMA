@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:alma/route_generator.dart';
 import 'package:alma/services/preferences.dart';
+import 'package:alma/services/web_socket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -7,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   await dotenv.load(fileName: "dev.env");
   await Preferences.load();
+  ApiWebSocket.getInstance().Init();
   runApp(const MyApp());
 }
 

@@ -1,7 +1,8 @@
-import 'package:alma/ui/config_page.dart';
-import 'package:alma/ui/cows_page.dart';
-import 'package:alma/ui/home_page.dart';
-import 'package:alma/ui/login.dart';
+import 'package:alma/models/cow.dart';
+import 'package:alma/ui/pages/cows_page.dart';
+import 'package:alma/ui/pages/edit_cow_page.dart';
+import 'package:alma/ui/pages/home_page.dart';
+import 'package:alma/ui/pages/login_page.dart';
 import 'package:alma/ui/welcome.dart';
 import 'package:flutter/material.dart';
 
@@ -18,9 +19,9 @@ class RouteGenerator{
       case '/home':
         return MaterialPageRoute(builder: (_) => HomePage());
       case '/config':
-        return MaterialPageRoute(builder: (_) => ConfigPage());
-      case '/cows':
         return MaterialPageRoute(builder: (_) => CowsPage());
+      case '/editCow':
+        return MaterialPageRoute(builder: (_) => EditCowPage(cow: args as Cow));
       default:
         return _errorRoute();
     }

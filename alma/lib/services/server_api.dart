@@ -7,17 +7,18 @@ import 'package:alma/models/cow.dart';
 import 'package:alma/models/user.dart';
 import 'package:alma/services/api_response.dart';
 import 'package:alma/services/preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:alma/services/web_socket.dart';
 import 'package:http/http.dart' as http;
 
 
 class ServerApi {
   static final ServerApi _instance = ServerApi();
   String? _token;
-  String urlBase = "https://192.168.0.114:20300";
+  String urlBase = "http://192.168.1.5:20240";
   http.Client client = http.Client();
   Function? onLogout;
   late Map<String, String> authHeader;
+  String? connId;
 
 
   Future logout() async{
@@ -29,7 +30,7 @@ class ServerApi {
 
   Future<String?> authUser(String email, String password) async {
     return await client.post(
-      getUrl(apiLogin),
+      getUrl(apiAuthLogin),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
@@ -51,7 +52,7 @@ class ServerApi {
 
   Future<String?> registerUser(String email, String password, String deviceId) async {
     return client.post(
-        getUrl(apiRegister),
+        getUrl(apiAuthRegister),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -78,7 +79,7 @@ class ServerApi {
 
   Future<String?> recoverPassword(String email) {
     return client.post(
-        getUrl(apiRecover),
+        getUrl(apiAuthRecover),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -118,8 +119,11 @@ class ServerApi {
   void buildAuthHeader(){
     authHeader = {
       'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $_token'
+      'Authorization': 'Bearer $_token',
     };
+    if(connId != null){
+      authHeader['ConnID'] = connId!;
+    }
   }
 
   Future<bool> getLoggedUser() async {
@@ -130,9 +134,12 @@ class ServerApi {
     }
     return false;
   }
-  ServerApi({
-    this.onLogout,
-  });
+  ServerApi({this.onLogout,}){
+    ApiWebSocket.getInstance().connected.listen((connId){
+      this.connId = connId;
+      buildAuthHeader();
+    });
+  }
 
   static ServerApi getInstance() {
     return _instance;
@@ -182,6 +189,26 @@ class ServerApi {
         data["payload"].forEach((e) => cows.add(Cow.fromJson(e)));
         return APIResponse(data: cows);
       } else {
+        return APIResponse(
+            error: true, errorMessage: getMessageError(data));
+      }
+    }));
+  }
+
+  Future<APIResponse> changePassword(String? email, String? oldPassword, String newPassword) {
+    return client.post(
+        getUrl(apiAuthChange),
+        headers: authHeader,
+        body: jsonEncode(<String, String>{
+          "Email": email??"",
+          "NewPassword": newPassword,
+          "OldPassword": oldPassword ?? "",
+        })
+    ).then(checkResponse((response) {
+      Map<String, dynamic> data = json.decode(response.body);
+      if (data["success"] == true) {
+        return APIResponse();
+      }else{
         return APIResponse(
             error: true, errorMessage: getMessageError(data));
       }

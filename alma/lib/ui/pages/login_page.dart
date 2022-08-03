@@ -3,6 +3,7 @@ import 'package:alma/services/server_api.dart';
 import 'package:alma/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
+
 class LoginPage extends StatelessWidget {
   LoginPage({Key? key}) : super(key: key);
   String email = Preferences.getInstance().getString("email") ?? "";
@@ -80,4 +81,3 @@ class LoginPage extends StatelessWidget {
     );
   }
 }
-
