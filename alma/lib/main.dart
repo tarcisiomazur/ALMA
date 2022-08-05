@@ -10,7 +10,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 void main() async {
   await dotenv.load(fileName: "dev.env");
   await Preferences.load();
-  ApiWebSocket.getInstance().Init();
   runApp(const MyApp());
 }
 
@@ -19,6 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const[Locale('pt', 'BR')],
       title: 'ALMA',

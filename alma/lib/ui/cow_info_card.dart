@@ -1,4 +1,5 @@
 import 'package:alma/models/cow.dart';
+import 'package:alma/utils/format.dart';
 import 'package:flutter/material.dart';
 
 class CowInfoCard extends StatelessWidget {
@@ -7,6 +8,7 @@ class CowInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String idade = Format.DurationToAge(DateTime.now().difference(cow.birthDate!));
     final medicationCardContent = Container(
       margin: EdgeInsets.all(16.0),
       constraints: BoxConstraints.expand(),
@@ -22,9 +24,9 @@ class CowInfoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(height: 5.0),
-                    Text(cow.id.toString()),
+                    Text("Id"),
                     Container(height: 5.0),
-                    Text(cow.weight.toString()),
+                    Text(cow.id.toString()),
                     Container(height: 5.0),
                   ],
                 ),
@@ -34,14 +36,14 @@ class CowInfoCard extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        Text('Dosage:',
+                        Text('Peso:',
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     Container(height: 5.0),
-                    Text(cow.tag,
+                    Text(cow.weight.toString(),
                         overflow: TextOverflow.ellipsis),
                     Container(height: 5.0),
                   ],
@@ -49,10 +51,10 @@ class CowInfoCard extends StatelessWidget {
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('Amount to give:'),
-                Text(cow.birthDate.toString()),
+                Text('Idade: '),
+                Text(idade),
               ],
             ),
           ],

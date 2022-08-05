@@ -13,7 +13,7 @@ import 'package:http/http.dart' as http;
 
 class ServerApi {
   static final ServerApi _instance = ServerApi();
-  String? _token;
+  String? token;
   String urlBase = "http://192.168.1.5:20240";
   http.Client client = http.Client();
   Function? onLogout;
@@ -76,7 +76,6 @@ class ServerApi {
     });
   }
 
-
   Future<String?> recoverPassword(String email) {
     return client.post(
         getUrl(apiAuthRecover),
@@ -111,29 +110,28 @@ class ServerApi {
   }
 
   void setToken(String newToken) {
-    _token = newToken;
+    token = newToken;
     buildAuthHeader();
+    ApiWebSocket.getInstance().Init();
     Preferences.getInstance().setString("token", newToken);
   }
 
   void buildAuthHeader(){
     authHeader = {
       'Content-Type': 'application/json; charset=UTF-8',
-      'Authorization': 'Bearer $_token',
+      'Authorization': 'Bearer $token',
     };
-    if(connId != null){
-      authHeader['ConnID'] = connId!;
-    }
   }
 
   Future<bool> getLoggedUser() async {
-    _token = Preferences.getInstance().getString("token");
-    if (_token != null) {
-      buildAuthHeader();
+    token = Preferences.getInstance().getString("token");
+    if (token != null) {
+      setToken(token!);
       return true;
     }
     return false;
   }
+
   ServerApi({this.onLogout,}){
     ApiWebSocket.getInstance().connected.listen((connId){
       this.connId = connId;

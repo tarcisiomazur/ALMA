@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:alma/services/server_api.dart';
 import 'package:web_socket_channel/io.dart';
 
 class ApiWebSocket{
@@ -16,16 +17,17 @@ class ApiWebSocket{
   get connected => _connected.stream;
 
   ApiWebSocket._(){
-    _connect();
     stream.listen(onMessage);
   }
 
   void Init(){
-
+    _connect();
   }
 
   void _connect() {
-    websocket = IOWebSocketChannel.connect('ws://192.168.1.5:20240');
+    websocket = IOWebSocketChannel.connect('ws://192.168.1.5:20240', headers: {
+      'Authorization': 'Bearer ${ServerApi.getInstance().token}',
+    });
     websocket.stream.listen((event) {
       _recipientCtrl.add(event);
     }, onError: (e) async {
@@ -43,6 +45,8 @@ class ApiWebSocket{
       String str = message.toString();
       if(str.contains("ConnID: ")){
         _connected.add(str.replaceFirst("ConnID: ", ""));
+      }else{
+        print(str);
       }
     }
   }
