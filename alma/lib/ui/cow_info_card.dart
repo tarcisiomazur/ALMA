@@ -8,63 +8,123 @@ class CowInfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String idade = Format.DurationToAge(DateTime.now().difference(cow.birthDate!));
-    final medicationCardContent = Container(
-      margin: EdgeInsets.all(16.0),
-      constraints: BoxConstraints.expand(),
-      child: Container(
-        height: 3.0,
-        child: Column(
+    String idade = Format.DateTimeToAge(cow.birthDate);
+    final cardTextStyle = TextStyle(
+      fontWeight: FontWeight.bold,
+    );
+    final medicationCardContent = Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
           children: <Widget>[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(height: 5.0),
-                    Text("Id"),
+                    Text("Brinco",
+                      style: cardTextStyle,
+                    ),
                     Container(height: 5.0),
-                    Text(cow.id.toString()),
+                    Text(cow.tag.toString()),
                     Container(height: 5.0),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        Text('Peso:',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    Container(height: 5.0),
+                    Text("Identificação",
+                      style: cardTextStyle,
                     ),
                     Container(height: 5.0),
-                    Text(cow.weight.toString(),
-                        overflow: TextOverflow.ellipsis),
+                    Text(cow.identification.toString()),
+                    Container(height: 5.0),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text('Escore', style: cardTextStyle),
+                    Container(height: 5.0),
+                    Text(cow.bcs.toString(),
+                      style: cow.bcs < 3
+                          ? cardTextStyle.copyWith(
+                          color: Colors.redAccent
+                      )
+                          : null,
+                    ),
                     Container(height: 5.0),
                   ],
                 ),
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
-                Text('Idade: '),
-                Text(idade),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(height: 5.0),
+                    Text("Produção Média",
+                      style: cardTextStyle,
+                    ),
+                    Container(height: 5.0),
+                    Text(cow.meanProduction.toString()),
+                    Container(height: 5.0),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    Text('Estado', style: cardTextStyle),
+                    Container(height: 5.0),
+
+                    Text(cow.state.name,
+                      style: cow.state == CowState.Death
+                          ? cardTextStyle.copyWith(
+                          color: Colors.redAccent
+                      )
+                          : null,
+                    ),
+                    Container(height: 5.0),
+                  ],
+                ),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(height: 5.0),
+                    Text("Idade",
+                      style: cardTextStyle,
+                    ),
+                    Container(height: 5.0),
+                    Text(idade),
+                    Container(height: 5.0),
+                  ],
+                ),
               ],
             ),
           ],
         ),
-      ),
     );
 
     final medicationCard = Container(
-      child: medicationCardContent,
-      height: 140.0,
+      child: Expanded(
+        child: Column(
+          children: [
+            medicationCardContent,
+          ],
+        ),
+      ),
       decoration: BoxDecoration(
         color: Color(0xFFFFFFFF),
         shape: BoxShape.rectangle,
@@ -80,7 +140,6 @@ class CowInfoCard extends StatelessWidget {
     );
 
     return Container(
-      height: 140.0,
       margin: EdgeInsets.all(8),
       child: Column(
         children: <Widget>[

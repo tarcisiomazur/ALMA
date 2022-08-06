@@ -1,3 +1,4 @@
+import 'package:alma/main.dart';
 import 'package:alma/models/user.dart';
 import 'package:alma/services/server_api.dart';
 import 'package:alma/ui/my_drawer.dart';
@@ -7,6 +8,8 @@ import 'package:flutter_login/src/widgets/animated_text_form_field.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  static const String route = '/home';
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -22,7 +25,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     serverApi = ServerApi.getInstance();
     serverApi.onLogout = () {
-      Navigator.pushReplacementNamed(context, "/");
+      Navigator.pushNamedAndRemoveUntil(MyApp.context, "/login", (route) => false);
     };
     _dataFuture = getUserData();
 
@@ -55,33 +58,38 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Widget wait = Scaffold(
+        appBar: AppBar(
+          title: Text("Alma - Sistemas de Controle"),
+        ),
+        body: Center(
+          child: SizedBox(
+            height: 50,
+            width: 50,
+            child: CircularProgressIndicator(),
+          ),
+        )
+    );
     return FutureBuilder(
       future: _dataFuture,
       builder: (BuildContext c, AsyncSnapshot s) {
         if (s.connectionState == ConnectionState.waiting) {
-          return Scaffold(
-              appBar: AppBar(
-                title: Text("Alma - Sistemas de Controle"),
-              ),
-              body: Center(
-              child: SizedBox(
-                height: 50,
-                width: 50,
-                child: CircularProgressIndicator(),
-              ),
-          )
-          );
+          return wait;
         }
         if (s.hasData) {
           return Text(s.data);
         }
+        if (user == null) {
+          _dataFuture = getUserData();
+          return wait;
+        }
         return page;
-      }
+      },
     );
   }
 
   void showPasswordDialog(BuildContext context) {
-    TextEditingController _passwordController = new TextEditingController();
+    final TextEditingController _passwordController = TextEditingController();
     showDialog(
       barrierDismissible: false,
       context: context,
@@ -103,21 +111,18 @@ class _HomePageState extends State<HomePage> {
                   const Text(
                       "Acesso com a senha temporária. Informe a nova senha:"),
                   AnimatedPasswordTextFormField(
+                    controller: _passwordController,
                       animatedWidth: 200,
                       labelText: "Nova senha",
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (value) {
-                        serverApi
-                            .changePassword(user?.email, null, value)
-                            .then((value) {
-                          if (!value.error) {
-                            Navigator.of(context).pop();
-                          }
-                        });
+                        serverApi.changePassword(user?.email, null, value);
+                        Navigator.of(context).pop();
                       },
                       validator: (value) => null),
                   MaterialButton(
-                    onPressed: () async {
+                    onPressed: () {
+                      serverApi.changePassword(user?.email, null, _passwordController.text);
                       Navigator.of(context).pop();
                     },
                     child: Container(
@@ -149,4 +154,5 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
 }

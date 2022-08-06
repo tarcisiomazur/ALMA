@@ -1,6 +1,10 @@
 class Format{
 
-  static String DurationToAge(Duration duration){
+  static String DateTimeToAge(DateTime? dateTime){
+    if(dateTime == null){
+      return "";
+    }
+    var duration = DateTime.now().difference(dateTime);
     String builder = "";
     int years = duration.inDays~/365;
     if(years > 1){
@@ -16,7 +20,7 @@ class Format{
     }
     if(builder==''){
       if(duration.inDays > 0){
-        builder += "$duration.inDays dias";
+        builder += "${duration.inDays} dias";
       }else if(duration.isNegative){
         builder += "Veio do futuro";
       }else{

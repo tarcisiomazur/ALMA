@@ -1,6 +1,8 @@
-
 import 'package:alma/models/user.dart';
 import 'package:alma/services/server_api.dart';
+import 'package:alma/ui/pages/config_page.dart';
+import 'package:alma/ui/pages/cows_page.dart';
+import 'package:alma/ui/pages/home_page.dart';
 import 'package:flutter/material.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -35,7 +37,7 @@ class MyDrawer extends StatelessWidget {
             leading: Icon(Icons.dashboard_rounded),
             title: Text('Dashboard'),
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/home');
+              Navigator.pushReplacementNamed(context, HomePage.route);
             },
           ),
           ListTile(
@@ -43,13 +45,13 @@ class MyDrawer extends StatelessWidget {
                 height: 24, color: Colors.grey[600]),
             title: Text('Rebanho'),
             onTap: () {
-              Navigator.pushReplacementNamed(context, '/cows');
+              Navigator.pushReplacementNamed(context, CowsPage.route);
             },
           ),
           ListTile(
             leading: Icon(Icons.settings),
             title: Text('Configurações'),
-            onTap: () => Navigator.popAndPushNamed(context, "/config"),
+            onTap: () => Navigator.popAndPushNamed(context, ConfigPage.route),
           ),
           ListTile(
             leading: Icon(Icons.logout),

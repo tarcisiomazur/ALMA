@@ -10,21 +10,20 @@ import 'package:flutter/material.dart';
 class RouteGenerator{
   static Route<dynamic> generateRoute(RouteSettings settings){
     final args = settings.arguments;
-
     switch(settings.name){
       case '/':
       case '/welcome':
-        return MaterialPageRoute(builder: (_) => Welcome());
-      case '/login':
-        return MaterialPageRoute(builder: (_) => LoginPage());
-      case '/home':
-        return MaterialPageRoute(builder: (_) => HomePage());
-      case '/config':
-        return MaterialPageRoute(builder: (_) => ConfigPage());
-      case '/cows':
-        return MaterialPageRoute(builder: (_) => CowsPage());
-      case '/editCow':
-        return MaterialPageRoute(builder: (_) => EditCowPage(cow: args as Cow));
+        return MaterialPageRoute(builder: (_) => Welcome(), settings: settings);
+      case LoginPage.route:
+        return MaterialPageRoute(builder: (_) => LoginPage(), settings: settings);
+      case HomePage.route:
+        return MaterialPageRoute(builder: (_) => HomePage(), settings: settings);
+      case ConfigPage.route:
+        return MaterialPageRoute(builder: (_) => ConfigPage(), settings: settings);
+      case CowsPage.route:
+        return MaterialPageRoute(builder: (_) => CowsPage(), settings: settings);
+      case EditCowPage.route:
+        return MaterialPageRoute(builder: (_) => EditCowPage(cow: args as Cow), settings: settings);
       default:
         return _errorRoute();
     }

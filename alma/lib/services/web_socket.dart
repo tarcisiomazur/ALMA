@@ -5,7 +5,7 @@ import 'package:web_socket_channel/io.dart';
 
 class ApiWebSocket{
   static final ApiWebSocket _instance = ApiWebSocket._();
-  late IOWebSocketChannel websocket;
+  late IOWebSocketChannel _websocket;
   final StreamController<dynamic> _recipientCtrl = StreamController<dynamic>();
   final StreamController<dynamic> _sentCtrl = StreamController<dynamic>();
   final StreamController<String> _connected = StreamController<String>();
@@ -18,6 +18,9 @@ class ApiWebSocket{
 
   ApiWebSocket._(){
     stream.listen(onMessage);
+    _sentCtrl.stream.listen((event) {
+      _websocket.sink.add(event);
+    });
   }
 
   void Init(){
@@ -25,11 +28,12 @@ class ApiWebSocket{
   }
 
   void _connect() {
-    websocket = IOWebSocketChannel.connect('ws://192.168.1.5:20240', headers: {
+    _websocket = IOWebSocketChannel.connect('ws://189.76.193.24:20240', headers: {
       'Authorization': 'Bearer ${ServerApi.getInstance().token}',
     });
-    websocket.stream.listen((event) {
+    _websocket.stream.listen((event) {
       _recipientCtrl.add(event);
+      sink.add("Ok");
     }, onError: (e) async {
       _recipientCtrl.addError(e);
       await Future.delayed(Duration(seconds: delay));

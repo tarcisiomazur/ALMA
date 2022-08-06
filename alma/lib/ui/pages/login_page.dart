@@ -1,11 +1,15 @@
 import 'package:alma/services/preferences.dart';
 import 'package:alma/services/server_api.dart';
+import 'package:alma/ui/pages/home_page.dart';
 import 'package:alma/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/flutter_login.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({Key? key}) : super(key: key);
+
+  static const String route = '/login';
+
   String email = Preferences.getInstance().getString("email") ?? "";
 
   Future<String?> _authUser(LoginData data) async {
@@ -57,7 +61,7 @@ class LoginPage extends StatelessWidget {
         )
       ],
       onSubmitAnimationCompleted: () {
-        Navigator.pushReplacementNamed(context, "/home");
+        Navigator.pushReplacementNamed(context, HomePage.route);
       },
       onRecoverPassword: _recoverPassword,
       messages: LoginMessages(

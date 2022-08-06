@@ -7,4 +7,4 @@ const String apiAuthChange="$apiAuth/change";
 const String apiUserData="api/userData";
 
 const String apiCow = "api/cow";
-const String apiGetCows="$apiCow/getAll";
+const String apiGetCows="$apiCow/all";

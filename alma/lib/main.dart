@@ -1,8 +1,5 @@
-import 'dart:io';
-
 import 'package:alma/route_generator.dart';
 import 'package:alma/services/preferences.dart';
-import 'package:alma/services/web_socket.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -15,9 +12,15 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  static GlobalKey<NavigatorState> navigatorKey = new GlobalKey<NavigatorState>();
+
+  static get context => navigatorKey.currentContext;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
       supportedLocales: const[Locale('pt', 'BR')],
