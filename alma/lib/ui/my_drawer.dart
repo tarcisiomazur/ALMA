@@ -1,6 +1,6 @@
 import 'package:alma/models/user.dart';
 import 'package:alma/services/server_api.dart';
-import 'package:alma/ui/pages/config_page.dart';
+import 'package:alma/ui/pages/settings_page.dart';
 import 'package:alma/ui/pages/cows_page.dart';
 import 'package:alma/ui/pages/home_page.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +51,7 @@ class MyDrawer extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.settings),
             title: Text('Configurações'),
-            onTap: () => Navigator.popAndPushNamed(context, ConfigPage.route),
+            onTap: () => Navigator.popAndPushNamed(context, SettingsPage.route),
           ),
           ListTile(
             leading: Icon(Icons.logout),

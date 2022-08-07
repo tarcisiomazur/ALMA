@@ -75,124 +75,131 @@ class _EditCowPageState extends State<EditCowPage> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          child: Expanded(
-            child: Card(
-              child: Container(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      margin: edges,
-                      child: Column(
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _tagController,
-                            inputFormatters: [
-                              LengthLimitingTextInputFormatter(45),
-                            ],
-                            keyboardType: TextInputType.text,
-                            decoration: const InputDecoration(
-                              labelText: 'Brinco',
+          child: Column(
+            children: [
+              Card(
+                child: Container(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: edges,
+                        child: Column(
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _tagController,
+                              inputFormatters: [
+                                LengthLimitingTextInputFormatter(45),
+                              ],
+                              keyboardType: TextInputType.text,
+                              decoration: const InputDecoration(
+                                labelText: 'Brinco',
+                              ),
+                              validator: (value) {
+                                if (value!.isEmpty) {
+                                  return 'Obrigatório';
+                                }
+                                return null;
+                              },
                             ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return 'Obrigatório';
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: edges,
+                        child: Column(
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _identificationController,
+                              decoration: const InputDecoration(
+                                labelText: 'Identificação',
+                              ),
+                              keyboardType: TextInputType.text,
+                              onChanged: (value) {},
+                            ),
+                          ],
+                        ),
+                      ),
+                      BuildDate(_birthDate, (value) => _birthDate = value,
+                          'Data de Nascimento'),
+                      Container(
+                        margin: edges,
+                        child: Column(children: <Widget>[
+                          DropdownButtonFormField(
+                              decoration: const InputDecoration(
+                                  labelText: "Estado"
+                              ),
+                              items: <CowState>[...CowState.values].map((
+                                  CowState value) {
+                                return DropdownMenuItem<CowState>(
+                                  value: value,
+                                  child: Text(value.name),
+                                );
+                              }).toList(),
+                              value: _state,
+                              onChanged: (value) {
+                                if (value != null) {
+                                  _state = value as CowState;
+                                }
                               }
-                              return null;
-                            },
-                          ),
+                          )
                         ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: edges,
-                      child: Column(
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _identificationController,
-                            decoration: const InputDecoration(
-                              labelText: 'Identificação',
+                      Container(
+                        margin: edges,
+                        child: Column(
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _bcsController,
+                              decoration: const InputDecoration(
+                                labelText: 'Escore',
+                              ),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.digitsOnly
+                              ],
+                              keyboardType: const TextInputType
+                                  .numberWithOptions(
+                                  decimal: false, signed: false),
+                              validator: (string) {
+                                var value = int.tryParse(string ?? "");
+                                return (value == null || value < 1 || value > 5)
+                                    ? 'O valor deve estar entre 1 e 5'
+                                    : null;
+                              },
+                              autovalidateMode: AutovalidateMode
+                                  .onUserInteraction,
                             ),
-                            keyboardType: TextInputType.text,
-                            onChanged: (value) {},
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    BuildDate(_birthDate, (value) => _birthDate = value, 'Data de Nascimento'),
-                    Container(
-                      margin: edges,
-                      child: Column(children: <Widget>[
-                        DropdownButtonFormField(
-                          decoration: const InputDecoration(
-                            labelText: "Estado"
-                          ),
-                            items: <CowState>[...CowState.values].map((CowState value) {
-                              return DropdownMenuItem<CowState>(
-                                value: value,
-                                child: Text(value.name),
-                              );
-                            }).toList(),
-                            value: _state,
-                            onChanged: (value) {
-                              if (value != null) {
-                                _state = value as CowState;
-                              }
-                            }
-                        )
-                      ],
-                      ),
-                    ),
-                    Container(
-                      margin: edges,
-                      child: Column(
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _bcsController,
-                            decoration: const InputDecoration(
-                              labelText: 'Escore',
-                            ),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.digitsOnly
-                            ],
-                            keyboardType: const TextInputType.numberWithOptions(decimal: false, signed: false),
-                            validator: (string) {
-                              var value = int.tryParse(string ?? "");
-                              return (value == null || value < 1 || value > 5)
-                                  ? 'O valor deve estar entre 1 e 5'
-                                  : null;
-                            },
-                            autovalidateMode: AutovalidateMode.onUserInteraction,
-                          ),
-                        ],
-                      ),
-                    ),
-                    BuildDate(_lastCalving, (value) => _lastCalving = value, 'Data do Último Parto'),
-                    BuildDate(_lastInsemination, (value) => _lastInsemination = value, 'Data da Última Inseminação'),
-                    Container(
-                      margin: edges,
-                      child: Column(
-                        children: <Widget>[
-                          TextFormField(
-                            controller: _noteController,
-                            maxLines: null,
-                            keyboardType: TextInputType.multiline,
-                            decoration: InputDecoration(
-                              labelText: 'Anotações',
-                              border: new OutlineInputBorder(
-                                borderRadius: new BorderRadius.circular(
-                                    10.0),
-                                borderSide: new BorderSide(),
+                      BuildDate(_lastCalving, (value) => _lastCalving = value,
+                          'Data do Último Parto'),
+                      BuildDate(_lastInsemination, (value) =>
+                      _lastInsemination = value, 'Data da Última Inseminação'),
+                      Container(
+                        margin: edges,
+                        child: Column(
+                          children: <Widget>[
+                            TextFormField(
+                              controller: _noteController,
+                              maxLines: null,
+                              keyboardType: TextInputType.multiline,
+                              decoration: InputDecoration(
+                                labelText: 'Anotações',
+                                border: new OutlineInputBorder(
+                                  borderRadius: new BorderRadius.circular(
+                                      10.0),
+                                  borderSide: new BorderSide(),
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      margin: edges,
-                      child: ListTile(
-                        title: Row(
+                      Container(
+                        margin: edges,
+                        child: Row(
                           children: <Widget>[
                             Expanded(
                               child: ElevatedButton(
@@ -221,11 +228,11 @@ class _EditCowPageState extends State<EditCowPage> {
                           ],
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
+            ],
           ),
         ),
       ),

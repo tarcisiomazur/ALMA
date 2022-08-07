@@ -3,6 +3,7 @@ import 'package:alma/models/user.dart';
 import 'package:alma/services/server_api.dart';
 import 'package:alma/ui/my_drawer.dart';
 import 'package:alma/ui/pages/dashboard_page.dart';
+import 'package:alma/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/src/widgets/animated_text_form_field.dart';
 
@@ -112,14 +113,15 @@ class _HomePageState extends State<HomePage> {
                       "Acesso com a senha temporária. Informe a nova senha:"),
                   AnimatedPasswordTextFormField(
                     controller: _passwordController,
-                      animatedWidth: 200,
-                      labelText: "Nova senha",
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (value) {
-                        serverApi.changePassword(user?.email, null, value);
-                        Navigator.of(context).pop();
-                      },
-                      validator: (value) => null),
+                    animatedWidth: 200,
+                    labelText: "Nova senha",
+                    textInputAction: TextInputAction.done,
+                    onFieldSubmitted: (value) {
+                      serverApi.changePassword(user?.email, null, value);
+                      Navigator.of(context).pop();
+                    },
+                    validator: Validation.isValidPassword,
+                  ),
                   MaterialButton(
                     onPressed: () {
                       serverApi.changePassword(user?.email, null, _passwordController.text);

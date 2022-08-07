@@ -1,5 +1,5 @@
 import 'package:alma/models/cow.dart';
-import 'package:alma/ui/pages/config_page.dart';
+import 'package:alma/ui/pages/settings_page.dart';
 import 'package:alma/ui/pages/cows_page.dart';
 import 'package:alma/ui/pages/edit_cow_page.dart';
 import 'package:alma/ui/pages/home_page.dart';
@@ -18,8 +18,8 @@ class RouteGenerator{
         return MaterialPageRoute(builder: (_) => LoginPage(), settings: settings);
       case HomePage.route:
         return MaterialPageRoute(builder: (_) => HomePage(), settings: settings);
-      case ConfigPage.route:
-        return MaterialPageRoute(builder: (_) => ConfigPage(), settings: settings);
+      case SettingsPage.route:
+        return MaterialPageRoute(builder: (_) => SettingsPage(), settings: settings);
       case CowsPage.route:
         return MaterialPageRoute(builder: (_) => CowsPage(), settings: settings);
       case EditCowPage.route:

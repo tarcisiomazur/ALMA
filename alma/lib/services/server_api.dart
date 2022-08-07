@@ -15,7 +15,7 @@ class ServerApi {
   static final ServerApi _instance = ServerApi();
   String? token;
   User? user;
-  String urlBase = "189.76.193.24:20240";
+  String urlBase = "localhost:20240";
   http.Client client = http.Client();
   Function? onLogout;
   late Map<String, String> authHeader;
@@ -83,7 +83,7 @@ class ServerApi {
   void setToken(String newToken) {
     token = newToken;
     buildAuthHeader();
-    ApiWebSocket.getInstance().Init();
+    //ApiWebSocket.getInstance().Init();
     Preferences.getInstance().setString("token", newToken);
   }
 
@@ -292,6 +292,10 @@ class ServerApi {
             error: true, errorMessage: getMessageError(data));
       }
     }));
+  }
+
+  void ping([String? ping]) {
+    client.put(getUrl("/"), body: ping??"Ping");
   }
 
 }

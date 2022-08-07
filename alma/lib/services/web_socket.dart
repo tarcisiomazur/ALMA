@@ -28,7 +28,7 @@ class ApiWebSocket{
   }
 
   void _connect() {
-    _websocket = IOWebSocketChannel.connect('ws://189.76.193.24:20240', headers: {
+    _websocket = IOWebSocketChannel.connect('ws://localhost:20240', headers: {
       'Authorization': 'Bearer ${ServerApi.getInstance().token}',
     });
     _websocket.stream.listen((event) {

@@ -118,13 +118,11 @@ class CowInfoCard extends StatelessWidget {
     );
 
     final medicationCard = Container(
-      child: Expanded(
-        child: Column(
+      child: Column(
           children: [
             medicationCardContent,
           ],
         ),
-      ),
       decoration: BoxDecoration(
         color: Color(0xFFFFFFFF),
         shape: BoxShape.rectangle,
