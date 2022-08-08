@@ -150,7 +150,7 @@ class ServerApi {
     ).then(checkResponse((response) {
       Map<String, dynamic> data = json.decode(response.body);
       if (data["success"] == true) {
-        return APIResponse();
+        return APIResponse(data: true);
       } else {
         return APIResponse(
             error: true, errorMessage: getMessageError(data));

@@ -272,8 +272,7 @@ class _EditCowPageState extends State<EditCowPage> {
   }
 
   void Save() async {
-    var formState = _formKey.currentState;
-    if (formState != null && _formKey.currentState!.validate()) {
+    if (_formKey.currentState != null && _formKey.currentState!.validate()) {
       widget.cow.tag = _tagController.text;
       widget.cow.identification = _identificationController.text;
       widget.cow.birthDate = _birthDate;

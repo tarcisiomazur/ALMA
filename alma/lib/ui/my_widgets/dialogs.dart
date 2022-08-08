@@ -1,12 +1,17 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 class FormDialog extends StatefulWidget {
+
   const FormDialog({
     Key? key,
-    this.children = const <Widget>[],
+    required this.content,
+    this.formKey,
   }) : super(key: key);
 
-  final List<Widget> children;
+  final Widget content;
+  final GlobalKey<FormState>? formKey;
 
   @override
   State<FormDialog> createState() => _FormDialogState();
@@ -15,8 +20,30 @@ class FormDialog extends StatefulWidget {
 class _FormDialogState extends State<FormDialog> {
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
+    final deviceSize = MediaQuery
+        .of(context)
+        .size;
+    final cardWidth = min(deviceSize.width * 0.75, 360.0);
+    const cardPadding = 16.0;
 
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
+      content: FittedBox(
+        child: Container(
+          padding: const EdgeInsets.only(
+            left: cardPadding,
+            top: cardPadding,
+            right: cardPadding,
+            bottom: cardPadding,
+          ),
+          width: cardWidth,
+          alignment: Alignment.center,
+          child: Form(
+            key: widget.formKey,
+            child: widget.content,
+          ),
+        ),
+      ),
     );
   }
 }
