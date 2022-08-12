@@ -45,6 +45,9 @@ dependencies:
   web_socket_channel: ^2.2.0
   datetime_picker_formfield: ^2.0.1
   intl: ^0.17.0
+  fl_chart: ^0.55.1
+  dropdown_button2: ^1.7.1
+  dropdown_textfield: ^1.0.3
 
 dev_dependencies:
   flutter_test:

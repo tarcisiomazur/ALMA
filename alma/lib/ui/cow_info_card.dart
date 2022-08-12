@@ -12,6 +12,10 @@ class CowInfoCard extends StatelessWidget {
     final cardTextStyle = TextStyle(
       fontWeight: FontWeight.bold,
     );
+    final bcsColor = cow.bcs == 1 || cow.bcs == 5 ? Color(0xFFDD0000):
+        cow.bcs == 2 || cow.bcs == 4 ? Color(0xFFC5AF19)
+        : Theme.of(context).primaryColor;
+
     final medicationCardContent = Padding(
       padding: EdgeInsets.all(16.0),
       child: Column(
@@ -50,11 +54,9 @@ class CowInfoCard extends StatelessWidget {
                     Text('Escore', style: cardTextStyle),
                     Container(height: 5.0),
                     Text(cow.bcs.toString(),
-                      style: cow.bcs < 3
-                          ? cardTextStyle.copyWith(
-                          color: Colors.redAccent
+                      style: cardTextStyle.copyWith(
+                          color: bcsColor
                       )
-                          : null,
                     ),
                     Container(height: 5.0),
                   ],
@@ -86,9 +88,8 @@ class CowInfoCard extends StatelessWidget {
                     Text(cow.state.name,
                       style: cow.state == CowState.Death
                           ? cardTextStyle.copyWith(
-                          color: Colors.redAccent
-                      )
-                          : null,
+                          color: Color(0xFFDD0000)
+                      ) : null,
                     ),
                     Container(height: 5.0),
                   ],
@@ -96,11 +97,10 @@ class CowInfoCard extends StatelessWidget {
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: <Widget>[
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Container(height: 5.0),
                     Text("Idade",

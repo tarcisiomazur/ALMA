@@ -49,6 +49,14 @@ class MyDrawer extends StatelessWidget {
             },
           ),
           ListTile(
+            leading: Image.asset("lib/assets/images/milking.png",
+                height: 24, color: Colors.grey[600]),
+            title: Text('Produção'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, CowsPage.route);
+            },
+          ),
+          ListTile(
             leading: Icon(Icons.settings),
             title: Text('Configurações'),
             onTap: () => Navigator.popAndPushNamed(context, SettingsPage.route),

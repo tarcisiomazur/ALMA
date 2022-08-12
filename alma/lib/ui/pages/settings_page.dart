@@ -3,6 +3,7 @@ import 'package:alma/services/server_api.dart';
 import 'package:alma/ui/my_widgets/buttons.dart';
 import 'package:alma/ui/my_widgets/dialogs.dart';
 import 'package:alma/utils/global_functions.dart';
+import 'package:alma/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_login/src/widgets/animated_text_form_field.dart';
 
@@ -82,10 +83,13 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
       vsync: this,
       duration: const Duration(milliseconds: 1000),
     );
+    final formKey = GlobalKey<FormState>();
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return FormDialog(
+          formKey: formKey,
           content: Wrap(
             runSpacing: 10,
             alignment: WrapAlignment.center,
@@ -105,10 +109,14 @@ class _SettingsPageState extends State<SettingsPage> with TickerProviderStateMix
                 animatedWidth: 200,
                 labelText: "Nova Senha",
                 textInputAction: TextInputAction.done,
+                validator: Validation.isValidPassword,
               ),
               WaitingButton(
                 text: "Confirmar",
                 onPressed: () async {
+                  if (formKey.currentState == null || !formKey.currentState!.validate()) {
+                    return;
+                  }
                   await animatedController.forward();
                   var result = await _serverApi.changePassword(
                       _user?.email, oldPasswordController.text,

@@ -89,7 +89,7 @@ class ServerApi {
 
   Future<String?> registerUser(String email, String password,
       String deviceId) async {
-    return client.post(
+    return client.put(
         getUrl(apiAuthRegister),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
@@ -209,7 +209,7 @@ class ServerApi {
     return client.get(
       getUrl(apiGetCows),
       headers: authHeader,
-    ).then(checkResponse((response) {
+    ).ifOk((response) {
       Map<String, dynamic> data = json.decode(response.body);
       if (data["success"] == true) {
         if (data["payload"] is! List) {
@@ -223,14 +223,14 @@ class ServerApi {
         return APIResponse(
             error: true, errorMessage: getMessageError(data));
       }
-    }));
+    });
   }
 
   Future<APIResponse<List<Cow>>> getCow(cowId) {
     return client.get(
       getUrl(apiCow, {"id": cowId.toString()}),
       headers: authHeader,
-    ).then(checkResponse((response) {
+    ).ifOk((response) {
       Map<String, dynamic> data = json.decode(response.body);
       if (data["success"] == true) {
         if (data["payload"] is! List) {
@@ -244,23 +244,24 @@ class ServerApi {
         return APIResponse(
             error: true, errorMessage: getMessageError(data));
       }
-    }));
+    });
   }
 
-  Future<APIResponse<bool>> updateCow(Cow cow) {
+
+  Future<APIResponse<bool>> updateCow(Cow cow) async{
     return client.put(
       getUrl(apiCow),
       headers: authHeader,
       body: jsonEncode(cow.toJson()),
-    ).then(checkResponse((response) {
+    ).ifOk((response) {
       Map<String, dynamic> data = json.decode(response.body);
       if (data["success"] == true) {
-        return APIResponse(data: true);
+        return APIResponse<bool>(data: true);
       } else {
-        return APIResponse(
+        return APIResponse<bool>(
             error: true, errorMessage: getMessageError(data));
       }
-    }));
+    });
   }
 
   Future<APIResponse<bool>> newCow(Cow cow) {
@@ -268,7 +269,7 @@ class ServerApi {
       getUrl(apiCow),
       headers: authHeader,
       body: jsonEncode(cow.toJson()),
-    ).then(checkResponse((response) {
+    ).ifOk((response) {
       Map<String, dynamic> data = json.decode(response.body);
       if (data["success"] == true) {
         return APIResponse(data: true);
@@ -276,14 +277,14 @@ class ServerApi {
         return APIResponse(
             error: true, errorMessage: getMessageError(data));
       }
-    }));
+    });
   }
 
   Future<APIResponse<bool>> deleteCow(int cowId) {
     return client.delete(
       getUrl(apiCow, {"id": cowId.toString()}),
       headers: authHeader,
-    ).then(checkResponse((response) {
+    ).ifOk((response) {
       Map<String, dynamic> data = json.decode(response.body);
       if (data["success"] == true) {
         return APIResponse(data: true);
@@ -291,11 +292,32 @@ class ServerApi {
         return APIResponse(
             error: true, errorMessage: getMessageError(data));
       }
-    }));
+    });
   }
 
   void ping([String? ping]) {
     client.put(getUrl("/"), body: ping??"Ping");
   }
 
+}
+
+extension FutureServiceExtension<T extends http.Response> on Future<T> {
+  Future<APIResponse<R>> ifOk<R>(FutureOr<APIResponse<R>> Function(T response) onValue) {
+    Future<APIResponse<R>> t = then((response){
+      switch (response.statusCode) {
+        case HttpStatus.ok:
+          return onValue(response);
+        case HttpStatus.unauthorized:
+          return APIResponse(error: true,
+              errorMessage: "Usuário não autorizado",
+              errorCode: 401);
+        default:
+          return APIResponse(
+              error: true, errorMessage: "Código de erro ${response.statusCode}");
+      }
+    });
+    return t.onError((error, stackTrace){
+      return APIResponse<R>(error: true, errorMessage: "Erro de Conexão. Verifique sua internet ou servidor proxy");
+    });
+  }
 }

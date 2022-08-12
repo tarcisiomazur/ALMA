@@ -6,6 +6,7 @@ import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:alma/ui/my_widgets/my_dropbutton.dart' as drop;
 
 class EditCowPage extends StatefulWidget {
   const EditCowPage({Key? key, required this.cow}) : super(key: key);
@@ -24,9 +25,9 @@ class _EditCowPageState extends State<EditCowPage> {
   final _tagController = TextEditingController();
   final _identificationController = TextEditingController();
   final _noteController = TextEditingController();
-  final _bcsController = TextEditingController();
   late String state;
   late CowState _state;
+  late int _bcs;
   late DateTime? _birthDate;
   late DateTime? _lastInsemination;
   late DateTime? _lastCalving;
@@ -43,8 +44,8 @@ class _EditCowPageState extends State<EditCowPage> {
     _lastCalving = cow.lastCalving;
     _noteController.text = cow.note;
     _tagController.text = cow.tag;
-    _bcsController.text = cow.bcs.toString();
     _identificationController.text = cow.identification;
+    _bcs = cow.bcs;
 
     super.initState();
   }
@@ -121,17 +122,17 @@ class _EditCowPageState extends State<EditCowPage> {
                         ),
                       ),
                       BuildDate(_birthDate, (value) => _birthDate = value,
-                          'Data de Nascimento'),
+                          'Data de Nascimento', edges),
                       Container(
                         margin: edges,
                         child: Column(children: <Widget>[
-                          DropdownButtonFormField(
+                          drop.DropdownButtonFormField2(
                               decoration: const InputDecoration(
-                                  labelText: "Estado"
+                                labelText: "Estado",
                               ),
                               items: <CowState>[...CowState.values].map((
                                   CowState value) {
-                                return DropdownMenuItem<CowState>(
+                                return drop.DropdownMenuItem<CowState>(
                                   value: value,
                                   child: Text(value.name),
                                 );
@@ -142,7 +143,7 @@ class _EditCowPageState extends State<EditCowPage> {
                                   _state = value as CowState;
                                 }
                               }
-                          )
+                          ),
                         ],
                         ),
                       ),
@@ -150,33 +151,32 @@ class _EditCowPageState extends State<EditCowPage> {
                         margin: edges,
                         child: Column(
                           children: <Widget>[
-                            TextFormField(
-                              controller: _bcsController,
-                              decoration: const InputDecoration(
-                                labelText: 'Escore',
-                              ),
-                              inputFormatters: [
-                                FilteringTextInputFormatter.digitsOnly
-                              ],
-                              keyboardType: const TextInputType
-                                  .numberWithOptions(
-                                  decimal: false, signed: false),
-                              validator: (string) {
-                                var value = int.tryParse(string ?? "");
-                                return (value == null || value < 1 || value > 5)
-                                    ? 'O valor deve estar entre 1 e 5'
-                                    : null;
-                              },
-                              autovalidateMode: AutovalidateMode
-                                  .onUserInteraction,
+                            DropdownButtonFormField(
+                                decoration: const InputDecoration(
+                                  labelText: "Escore",
+                                ),
+                                isExpanded: true,
+                                items: <int>[1,2,3,4,5].map((int value) {
+                                  return DropdownMenuItem<int>(
+                                      value: value,
+                                      child: Text(value.toString(),
+                                    ),
+                                  );
+                                }).toList(),
+                                value: _bcs,
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    _bcs = value as int;
+                                  }
+                                }
                             ),
                           ],
                         ),
                       ),
                       BuildDate(_lastCalving, (value) => _lastCalving = value,
-                          'Data do Último Parto'),
+                          'Data do Último Parto', edges),
                       BuildDate(_lastInsemination, (value) =>
-                      _lastInsemination = value, 'Data da Última Inseminação'),
+                      _lastInsemination = value, 'Data da Última Inseminação', edges),
                       Container(
                         margin: edges,
                         child: Column(
@@ -201,21 +201,18 @@ class _EditCowPageState extends State<EditCowPage> {
                         margin: edges,
                         child: Row(
                           children: <Widget>[
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: Save,
-                                child: const Text('Salvar',
-                                    style: const TextStyle(
-                                        color: Colors.white)),
-                              ),
-                            ),
                             if(!_isNew) ...[
-                              const SizedBox(width: 50),
                               Expanded(
+                                flex: 1,
+                                child: Container(),
+                              ),
+                              Flexible(
+                                flex: 3,
+                                fit: FlexFit.tight,
                                 child: ElevatedButton(
                                   onPressed: Excluir,
                                   style: ElevatedButton.styleFrom(
-                                    primary: Colors.redAccent,
+                                    primary: Color(0xffdd0000),
                                   ),
                                   child: const Text('Excluir',
                                       style: TextStyle(
@@ -223,6 +220,10 @@ class _EditCowPageState extends State<EditCowPage> {
                                       )
                                   ),
                                 ),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Container(),
                               ),
                             ],
                           ],
@@ -248,9 +249,9 @@ class _EditCowPageState extends State<EditCowPage> {
     }).toList();
   }
 
-  Widget BuildDate(DateTime? value, Function(DateTime? value) onChanged, String label) {
+  Widget BuildDate(DateTime? value, Function(DateTime? value) onChanged, String label, EdgeInsets edges) {
     return Container(
-      margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+      margin: edges,
       child: DateTimeField(
         format: format,
         onShowPicker: (context, currentValue) {
@@ -277,7 +278,7 @@ class _EditCowPageState extends State<EditCowPage> {
       widget.cow.identification = _identificationController.text;
       widget.cow.birthDate = _birthDate;
       widget.cow.state = _state;
-      widget.cow.bcs = int.parse(_bcsController.text);
+      widget.cow.bcs = _bcs;
       widget.cow.lastCalving = _lastCalving;
       widget.cow.lastInsemination = _lastInsemination;
       widget.cow.note = _noteController.text;
@@ -294,12 +295,15 @@ class _EditCowPageState extends State<EditCowPage> {
       ));
       if(result.error) {
         showErrorDialog(context,"Erro ao Salvar\nResposta do servidor: "
-            "${result.errorCode}: ${result.errorMessage}");
+            "${result.errorCode ?? ""}{result.errorMessage}");
       }
     }
   }
 
   void Excluir() async {
+    if(!await showConfirmDialog(context, "Tem certeza que deseja excluir o animal?")){
+      return;
+    }
     showDbDialog();
     var result = await ServerApi.getInstance().deleteCow(widget.cow.id);
     if (!mounted) return;
@@ -310,7 +314,7 @@ class _EditCowPageState extends State<EditCowPage> {
     ));
     if(result.error) {
       showErrorDialog(context, "Erro ao Excluir\nResposta do servidor: "
-          "${result.errorCode}: ${result.errorMessage}");
+          "${result.errorCode ?? ""}{result.errorMessage}");
     }
 
   }
